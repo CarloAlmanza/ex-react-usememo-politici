@@ -10,8 +10,10 @@ function PoliticiList() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    //stato della ricerca
+    //stato ricerca
     const [query, setQuery] = useState("");
+    //stato posizione selezionata ("" = tutte)
+    const [posizioneSelezionata, setPosizioneSelezionata] = useState("");
 
     //fetch al mount
     useEffect(() => {
@@ -37,24 +39,42 @@ function PoliticiList() {
         };
     }, []);
 
-    //array derivato e memoizzato
+    //array derivato: posizioni uniche (ordinate alfabeticamente)
+    const posizioniDisponibili = useMemo(() => {
+        const set = new Set();
+        for (const p of politici) {
+            if (p.position) set.add(p.position);
+        }
+        return Array.from(set).sort((a, b) => a.localeCompare(b));
+    }, [politici]);
+
+    //array derivato: politici filtrati (query + posizione)
     const politiciFiltrati = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return politici;
 
         return politici.filter((p) => {
+            // filtro posizione
+            if (posizioneSelezionata && p.position !== posizioneSelezionata) {
+                return false;
+            }
+
+            // filtro testo (se vuoto, passa)
+            if (!q) return true;
+
             const nome = (p.name ?? "").toLowerCase();
             const bio = (p.biography ?? "").toLowerCase();
             return nome.includes(q) || bio.includes(q);
         });
-    }, [politici, query]);
+    }, [politici, query, posizioneSelezionata]);
 
     if (loading) return <p className="stato">Caricamento politici…</p>;
     if (error) return <p className="stato errore">Errore: {error}</p>;
 
+    const filtriAttivi = query || posizioneSelezionata;
+
     return (
         <section>
-            <div className="ricerca">
+            <div className="filtri">
                 <input
                     type="text"
                     value={query}
@@ -62,16 +82,41 @@ function PoliticiList() {
                     placeholder="Cerca per nome o biografia…"
                     aria-label="Cerca politici"
                 />
-                {query && (
-                    <span className="contatore">
-                        {politiciFiltrati.length} risultat
-                        {politiciFiltrati.length === 1 ? "o" : "i"}
-                    </span>
+
+                <select
+                    value={posizioneSelezionata}
+                    onChange={(e) => setPosizioneSelezionata(e.target.value)}
+                    aria-label="Filtra per posizione"
+                >
+                    <option value="">Tutte le posizioni</option>
+                    {posizioniDisponibili.map((pos) => (
+                        <option key={pos} value={pos}>
+                            {pos}
+                        </option>
+                    ))}
+                </select>
+
+                {filtriAttivi && (
+                    <button
+                        type="button"
+                        className="reset"
+                        onClick={() => {
+                            setQuery("");
+                            setPosizioneSelezionata("");
+                        }}
+                    >
+                        Reset
+                    </button>
                 )}
+
+                <span className="contatore">
+                    {politiciFiltrati.length} risultat
+                    {politiciFiltrati.length === 1 ? "o" : "i"}
+                </span>
             </div>
 
             {politiciFiltrati.length === 0 ? (
-                <p className="stato">Nessun politico corrisponde a "{query}".</p>
+                <p className="stato">Nessun politico corrisponde ai filtri.</p>
             ) : (
                 <div className="politici-list">
                     {politiciFiltrati.map((p) => (
