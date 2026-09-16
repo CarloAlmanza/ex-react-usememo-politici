@@ -4,6 +4,8 @@ import PoliticoCard from "./PoliticoCard";
 const API_URL = "http://localhost:3333/politicians";
 
 function PoliticiList() {
+    console.log("🔵 Render PoliticiList");
+
     const [politici, setPolitici] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -11,7 +13,7 @@ function PoliticiList() {
     //stato della ricerca
     const [query, setQuery] = useState("");
 
-    // fetch (invariata dalla milestone 1)
+    //fetch al mount
     useEffect(() => {
         let cancelled = false;
 
@@ -30,7 +32,9 @@ function PoliticiList() {
         }
 
         fetchPolitici();
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     //array derivato e memoizzato

@@ -1,4 +1,8 @@
+import { memo } from "react";
+
 function PoliticoCard({ politico }) {
+    console.log("Render PoliticoCard:", politico.name);
+
     const { name, image, position, biography } = politico;
 
     return (
@@ -13,4 +17,4 @@ function PoliticoCard({ politico }) {
     );
 }
 
-export default PoliticoCard;
+export default memo(PoliticoCard);
