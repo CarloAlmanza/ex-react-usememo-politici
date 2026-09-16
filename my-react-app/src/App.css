@@ -64,3 +64,30 @@
 .stato.errore {
   color: #c0392b;
 }
+
+.ricerca {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ricerca input {
+  flex: 1;
+  padding: 0.65rem 0.9rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.ricerca input:focus {
+  border-color: #4a90e2;
+}
+
+.contatore {
+  font-size: 0.85rem;
+  color: #666;
+  white-space: nowrap;
+}
